@@ -82,18 +82,18 @@ This application follows a **Client-Server Architecture**:
 ├── controllers/            # Business logic for API endpoints
 │   ├── authController.js   # User signup and login logic
 │   └── taskController.js   # Task CRUD operations
-└── middleware/             # Express middleware
-    └── authMiddleware.js   # JWT authentication middleware
+├── middleware/             # Express middleware
+│   └── authMiddleware.js   # JWT authentication middleware
 └── public/                     # Frontend HTML/CSS/JS files
-├── login.html              # User login and signup interface
-└── dashboard.html          # Main Todo application interface
+    ├── login.html              # User login and signup interface
+    └── dashboard.html          # Main Todo application interface
 ```
 
 ---
 
 ### 📊 ER Diagram
 
-[**Link to ER Diagram**]()
+[**Link to ER Diagram**](https://lucid.app/lucidchart/4d5b049a-bab6-4deb-beb6-f0d7c1783a2c/edit?viewport_loc=-754%2C-1728%2C2186%2C1532%2C0_0&invitationId=inv_6808513c-3062-48a7-84b8-6db7dcde84e2)
 
 *(This section will contain a link to the Entity-Relationship Diagram that visually represents the database schema. The diagram shows the `Users` and `Tasks` entities and their one-to-many relationship, with `user_id` as the foreign key in `Tasks` referencing `Users`.)*
 
