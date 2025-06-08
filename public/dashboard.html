@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Todo Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            margin-top: 50px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 10px;
+        }
+        .header-section h2 {
+            margin: 0;
+            flex-grow: 1; /* Allow heading to take available space */
+            text-align: left;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logout-btn {
+            background-color: #f0ad4e;
+            width: auto; /* Override default button width */
+        }
+        .logout-btn:hover {
+            background-color: #ec971f;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .task-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .task-input-section input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            min-width: 150px; /* Ensure input doesn't get too small */
+        }
+        .task-input-section button {
+            width: auto;
+            min-width: 100px;
+        }
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filters button {
+            width: auto;
+            padding: 8px 12px;
+        }
+        .filters button.active {
+            background-color: #28a745;
+        }
+        .filters button.active:hover {
+            background-color: #218838;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .task-item.completed {
+            background-color: #e6ffe6;
+            text-decoration: line-through;
+            color: #666;
+        }
+        .task-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .task-item-actions button {
+            width: auto;
+            padding: 6px 10px;
+            margin: 0;
+            font-size: 0.9em;
+        }
+        .task-item-actions .complete-btn {
+            background-color: #28a745;
+        }
+        .task-item-actions .complete-btn:hover {
+            background-color: #218838;
+        }
+        .task-item-actions .delete-btn {
+            background-color: #dc3545;
+        }
+        .task-item-actions .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .task-item-actions .restore-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .task-item-actions .restore-btn:hover {
+            background-color: #e0a800;
+        }
+        @media (max-width: 600px) {
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-section h2 {
+                text-align: center; /* Center heading on small screens */
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .logout-btn {
+                width: 100%;
+            }
+            .task-input-section {
+                flex-direction: column;
+            }
+            .task-input-section input,
+            .task-input-section button {
+                width: 100%;
+            }
+            .filters {
+                flex-direction: column;
+            }
+            .filters button {
+                width: 100%;
+            }
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .task-item-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            .task-item-actions button {
+                flex-grow: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h2 id="welcome-message"></h2>
+            <button id="logout-btn" class="logout-btn">Logout</button>
+        </div>
+
+        <div class="message" id="todo-message"></div>
+
+        <div class="todo-app">
+            <h1>Your Tasks</h1>
+            <div class="task-input-section">
+                <input type="text" id="new-task-input" placeholder="Add a new task...">
+                <button id="add-task-btn">Add Task</button>
+            </div>
+
+            <div class="filters">
+                <button id="filter-all" class="active">All</button>
+                <button id="filter-pending">Pending</button>
+                <button id="filter-completed">Completed</button>
+                <button id="filter-deleted">Deleted</button>
+            </div>
+
+            <ul class="task-list" id="task-list">
+                <!-- Tasks will be rendered here by JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const welcomeMessage = document.getElementById('welcome-message');
+        const logoutBtn = document.getElementById('logout-btn');
+        const todoMessage = document.getElementById('todo-message');
+        const newTaskInput = document.getElementById('new-task-input');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const taskList = document.getElementById('task-list');
+        const filterAllBtn = document.getElementById('filter-all');
+        const filterPendingBtn = document.getElementById('filter-pending');
+        const filterCompletedBtn = document.getElementById('filter-completed');
+        const filterDeletedBtn = document.getElementById('filter-deleted');
+
+        let authToken = localStorage.getItem('authToken');
+        let currentUsername = localStorage.getItem('currentUsername');
+        let tasks = [];
+        let currentFilter = 'all';
+
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        // --- Utility Functions ---
+        function displayMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            setTimeout(() => { element.textContent = ''; element.className = 'message'; }, 5000);
+        }
+
+        function checkAuthAndRedirect() {
+            if (!authToken || !currentUsername) {
+                console.warn('No auth token found, redirecting to login.');
+                window.location.href = 'login.html'; // Redirect if not authenticated
+            } else {
+                welcomeMessage.textContent = `Welcome, ${currentUsername}!`;
+                fetchTasks(); // Fetch tasks for the logged-in user
+            }
+        }
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+
+            const filteredTasks = tasks.filter(task => {
+                if (currentFilter === 'all') return true;
+                return task.status === currentFilter;
+            });
+
+            if (filteredTasks.length === 0 && tasks.length > 0 && currentFilter !== 'all') {
+                 displayMessage(todoMessage, `No ${currentFilter} tasks found.`, ''); // Neutral message
+            } else if (tasks.length === 0) {
+                 displayMessage(todoMessage, 'No tasks yet! Add one above.', '');
+            } else {
+                todoMessage.textContent = ''; // Clear message if tasks are present
+                todoMessage.className = 'message';
+            }
+
+            filteredTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.status}`;
+                li.dataset.taskId = task._id; // Use task._id from MongoDB
+
+                const taskTitle = document.createElement('span');
+                taskTitle.textContent = task.title;
+                li.appendChild(taskTitle);
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'task-item-actions';
+
+                // Conditional buttons based on status
+                if (task.status === 'pending') {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.textContent = 'Complete';
+                    completeBtn.className = 'complete-btn';
+                    completeBtn.addEventListener('click', () => updateTaskStatus(task._id, 'completed'));
+                    actionsDiv.appendChild(completeBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.addEventListener('click', () => updateTaskStatus(task._id, 'deleted'));
+                    actionsDiv.appendChild(deleteBtn);
+                } else if (task.status === 'completed' || task.status === 'deleted') {
+                    const restoreBtn = document.createElement('button');
+                    restoreBtn.textContent = 'Restore';
+                    restoreBtn.className = 'restore-btn';
+                    restoreBtn.addEventListener('click', () => updateTaskStatus(task._id, 'pending'));
+                    actionsDiv.appendChild(restoreBtn);
+
+                    // For completed/deleted tasks, also allow permanent delete if desired (optional)
+                    // const permDeleteBtn = document.createElement('button');
+                    // permDeleteBtn.textContent = 'Perm. Delete';
+                    // permDeleteBtn.className = 'delete-btn';
+                    // permDeleteBtn.addEventListener('click', () => deleteTask(task._id));
+                    // actionsDiv.appendChild(permDeleteBtn);
+                }
+
+                li.appendChild(actionsDiv);
+                taskList.appendChild(li);
+            });
+            console.log(`Tasks rendered with filter: ${currentFilter}`);
+        }
+
+        function setActiveFilterButton(filterName) {
+            filterAllBtn.classList.remove('active');
+            filterPendingBtn.classList.remove('active');
+            filterCompletedBtn.classList.remove('active');
+            filterDeletedBtn.classList.remove('active');
+
+            if (filterName === 'all') filterAllBtn.classList.add('active');
+            else if (filterName === 'pending') filterPendingBtn.classList.add('active');
+            else if (filterName === 'completed') filterCompletedBtn.classList.add('active');
+            else if (filterName === 'deleted') filterDeletedBtn.classList.add('active');
+
+            currentFilter = filterName;
+            renderTasks();
+        }
+
+        // --- API Interaction Functions ---
+
+        async function fetchTasks() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    tasks = data;
+                    renderTasks();
+                    console.log('Tasks fetched successfully.');
+                } else {
+                    displayMessage(todoMessage, data.error || 'Failed to fetch tasks.', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        displayMessage(todoMessage, 'Session expired or unauthorized. Please log in again.', 'error');
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch tasks API Error:', error);
+                displayMessage(todoMessage, `Network error: Could not connect to API.`, 'error');
+            }
+        }
+
+        async function addTask() {
+            const title = newTaskInput.value.trim();
+            if (!title) {
+                displayMessage(todoMessage, 'Task title cannot be empty.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ title })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayMessage(todoMessage, 'Task added successfully!', 'success');
+                    newTaskInput.value = '';
+                    fetchTasks(); // Refresh list to show new task
+                } else {
+                    displayMessage(todoMessage, data.error || 'Failed to add task.', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Add task API Error:', error);
+                displayMessage(todoMessage, `Network error: Could not connect to API.`, 'error');
+            }
+        }
+
+        async function updateTaskStatus(taskId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks/${taskId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayMessage(todoMessage, `Task status updated to '${newStatus}'!`, 'success');
+                    fetchTasks(); // Refresh list
+                } else {
+                    displayMessage(todoMessage, data.error || 'Failed to update task status.', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Update task status API Error:', error);
+                displayMessage(todoMessage, `Network error: Could not connect to API.`, 'error');
+            }
+        }
+
+        // Optional: Function for permanent deletion, not just status change to 'deleted'
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to permanently delete this task? This cannot be undone.')) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    displayMessage(todoMessage, 'Task permanently deleted!', 'success');
+                    fetchTasks(); // Refresh list
+                } else {
+                    const data = await response.json();
+                    displayMessage(todoMessage, data.error || 'Failed to delete task permanently.', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Delete task API Error:', error);
+                displayMessage(todoMessage, `Network error: Could not connect to API.`, 'error');
+            }
+        }
+
+
+        // --- Event Listeners ---
+        logoutBtn.addEventListener('click', () => {
+            localStorage.clear(); // Clear token and username
+            window.location.href = 'login.html'; // Redirect to login page
+        });
+        addTaskBtn.addEventListener('click', addTask);
+        newTaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        filterAllBtn.addEventListener('click', () => setActiveFilterButton('all'));
+        filterPendingBtn.addEventListener('click', () => setActiveFilterButton('pending'));
+        filterCompletedBtn.addEventListener('click', () => setActiveFilterButton('completed'));
+        filterDeletedBtn.addEventListener('click', () => setActiveFilterButton('deleted'));
+
+        // --- Initial Load ---
+        window.addEventListener('load', checkAuthAndRedirect);
+    </script>
+</body>
+</html>
