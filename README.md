@@ -1,4 +1,4 @@
-# README: Simple Node.js Todo Application
+# Simple Node.js Todo Application
 
 ---
 
@@ -72,19 +72,18 @@ This application follows a **Client-Server Architecture**:
 ### 📂 Project Structure
 
 ```
-├── todo-app-backend/           # Node.js API server
-│   ├── .env                    # Environment variables (e.g., MongoDB URI, JWT Secret)
-│   ├── package.json            # Backend dependencies and scripts
-│   ├── server.js               # Main Express application, routes, and global error handling
-│   ├── db.js                   # MongoDB connection logic
-│   ├── models/                 # Mongoose schemas for MongoDB collections
-│   │   ├── User.js             # User schema
-│   │   └── Task.js             # Task schema
-│   ├── controllers/            # Business logic for API endpoints
-│   │   ├── authController.js   # User signup and login logic
-│   │   └── taskController.js   # Task CRUD operations
-│   └── middleware/             # Express middleware
-│       └── authMiddleware.js   # JWT authentication middleware
+├── .env                    # Environment variables (e.g., MongoDB URI, JWT Secret)
+├── package.json            # Backend dependencies and scripts
+├── server.js               # Main Express application, routes, and global error handling
+├── db.js                   # MongoDB connection logic
+├── models/                 # Mongoose schemas for MongoDB collections
+│   ├── User.js             # User schema
+│   └── Task.js             # Task schema
+├── controllers/            # Business logic for API endpoints
+│   ├── authController.js   # User signup and login logic
+│   └── taskController.js   # Task CRUD operations
+└── middleware/             # Express middleware
+    └── authMiddleware.js   # JWT authentication middleware
 └── public/                     # Frontend HTML/CSS/JS files
 ├── login.html              # User login and signup interface
 └── dashboard.html          # Main Todo application interface
