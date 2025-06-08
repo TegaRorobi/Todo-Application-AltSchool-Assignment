@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App - Login/Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 22px); /* Account for padding + border */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .toggle-auth-btn {
+            background-color: #6c757d;
+        }
+        .toggle-auth-btn:hover {
+            background-color: #5a6268;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="auth-title">Sign Up</h1>
+        <div class="message" id="auth-message"></div>
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter password">
+        </div>
+
+        <button id="auth-submit-btn">Sign Up</button>
+        <button id="toggle-auth-mode-btn" class="toggle-auth-btn">Switch to Login</button>
+    </div>
+
+    <script>
+        const authTitle = document.getElementById('auth-title');
+        const authMessage = document.getElementById('auth-message');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode-btn');
+
+        let isLoginMode = false;
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        function displayMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = `message ${type}`;
+            setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'message'; }, 5000);
+        }
+
+        async function handleAuth() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                displayMessage('Username and password cannot be empty.', 'error');
+                return;
+            }
+
+            const endpoint = isLoginMode ? '/login' : '/signup';
+            console.log(`Attempting ${isLoginMode ? 'login' : 'signup'} for ${username}...`);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayMessage(data.message || `Successfully ${isLoginMode ? 'logged in' : 'signed up'}!`, 'success');
+                    if (isLoginMode) {
+                        localStorage.setItem('authToken', data.token);
+                        localStorage.setItem('currentUsername', data.username);
+                        window.location.href = 'dashboard.html'; // Redirect to dashboard on successful login
+                    } else {
+                        // After signup, automatically switch to login mode or prompt user to login
+                        displayMessage('Signup successful! Please log in.', 'success');
+                        isLoginMode = true;
+                        authTitle.textContent = 'Login';
+                        authSubmitBtn.textContent = 'Login';
+                        toggleAuthModeBtn.textContent = 'Switch to Sign Up';
+                        usernameInput.value = username; // Keep username, clear password
+                        passwordInput.value = '';
+                    }
+                } else {
+                    displayMessage(data.error || `Failed to ${isLoginMode ? 'login' : 'sign up'}.`, 'error');
+                }
+            } catch (error) {
+                console.error('Auth API Error:', error);
+                displayMessage(`Network error: Could not connect to API or server issue.`, 'error');
+            }
+        }
+
+        authSubmitBtn.addEventListener('click', handleAuth);
+        toggleAuthModeBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            authTitle.textContent = isLoginMode ? 'Login' : 'Sign Up';
+            authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Sign Up';
+            toggleAuthModeBtn.textContent = isLoginMode ? 'Switch to Sign Up' : 'Switch to Login';
+            authMessage.textContent = '';
+            passwordInput.value = ''; // Clear password on mode switch for security
+        });
+
+        // Check if already authenticated and redirect
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('authToken') && localStorage.getItem('currentUsername')) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>
