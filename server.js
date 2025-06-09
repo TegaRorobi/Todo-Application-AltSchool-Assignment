@@ -13,7 +13,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Use port from env or default to 3000
+const PORT = process.env.PORT || 8000; // Use port from env or default to 8000
 
 // --- Middleware ---
 app.use(express.json()); // Body parser for JSON requests
