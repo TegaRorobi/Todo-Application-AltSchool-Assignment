@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000; // Use port from env or default to 3000
 // --- Middleware ---
 app.use(express.json()); // Body parser for JSON requests
 app.use(cors({
-    origin: '*', // Allow all origins for development. In production, specify your frontend URL(s).
+    origin: ['http://localhost:3000', 'https://todo-app-altschool-assignment-client.onrender.com'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
