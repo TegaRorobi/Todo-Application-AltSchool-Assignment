@@ -32,6 +32,12 @@ app.use((req, res, next) => {
 
 // --- Routes ---
 
+// Default Route (Public)
+home = async (req, res) => {
+    return res.status(200).json({message:'Welcome to the TodoApp Server. See logs for Endpoint list.'});
+}
+app.get('/', home);
+
 // Authentication Routes (Public)
 app.post('/api/signup', authController.signup);
 app.post('/api/login', authController.login);
