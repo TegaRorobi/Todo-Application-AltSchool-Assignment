@@ -148,9 +148,9 @@
                     if (isLoginMode) {
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentUsername', data.username);
-                        window.location.href = 'dashboard.html'; // Redirect to dashboard on successful login
+                        window.location.href = 'dashboard.html'; // Redirect to the dashboard after a successful login
                     } else {
-                        // After signup, automatically switch to login mode or prompt user to login
+                        // After signup, automatically switch to login mode or prompt the user to login
                         displayMessage('Signup successful! Please log in.', 'success');
                         isLoginMode = true;
                         authTitle.textContent = 'Login';
@@ -175,7 +175,7 @@
             authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Sign Up';
             toggleAuthModeBtn.textContent = isLoginMode ? 'Switch to Sign Up' : 'Switch to Login';
             authMessage.textContent = '';
-            passwordInput.value = ''; // Clear password on mode switch for security
+            passwordInput.value = ''; // Clear password after switching the mode for security
         });
 
         // Check if already authenticated and redirect

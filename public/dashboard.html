@@ -137,6 +137,11 @@
             text-decoration: line-through;
             color: #666;
         }
+        .task-item.deleted {
+            background-color:rgb(255, 226, 226);
+            text-decoration: line-through;
+            color: #666;
+        }
         .task-item-actions {
             display: flex;
             gap: 8px;
@@ -229,9 +234,7 @@
                 <button id="filter-deleted">Deleted</button>
             </div>
 
-            <ul class="task-list" id="task-list">
-                <!-- Tasks will be rendered here by JavaScript -->
-            </ul>
+            <ul class="task-list" id="task-list"></ul>
         </div>
     </div>
 
@@ -285,14 +288,14 @@
             } else if (tasks.length === 0) {
                  displayMessage(todoMessage, 'No tasks yet! Add one above.', '');
             } else {
-                todoMessage.textContent = ''; // Clear message if tasks are present
+                todoMessage.textContent = ''; // Clear themessage if there are actually tasks present
                 todoMessage.className = 'message';
             }
 
             filteredTasks.forEach(task => {
                 const li = document.createElement('li');
                 li.className = `task-item ${task.status}`;
-                li.dataset.taskId = task._id; // Use task._id from MongoDB
+                li.dataset.taskId = task._id; // Use the task._id from MongoDB
 
                 const taskTitle = document.createElement('span');
                 taskTitle.textContent = task.title;
@@ -314,6 +317,7 @@
                     deleteBtn.className = 'delete-btn';
                     deleteBtn.addEventListener('click', () => updateTaskStatus(task._id, 'deleted'));
                     actionsDiv.appendChild(deleteBtn);
+
                 } else if (task.status === 'completed' || task.status === 'deleted') {
                     const restoreBtn = document.createElement('button');
                     restoreBtn.textContent = 'Restore';
@@ -321,12 +325,11 @@
                     restoreBtn.addEventListener('click', () => updateTaskStatus(task._id, 'pending'));
                     actionsDiv.appendChild(restoreBtn);
 
-                    // For completed/deleted tasks, also allow permanent delete if desired (optional)
-                    // const permDeleteBtn = document.createElement('button');
-                    // permDeleteBtn.textContent = 'Perm. Delete';
-                    // permDeleteBtn.className = 'delete-btn';
-                    // permDeleteBtn.addEventListener('click', () => deleteTask(task._id));
-                    // actionsDiv.appendChild(permDeleteBtn);
+                    const permDeleteBtn = document.createElement('button');
+                    permDeleteBtn.textContent = 'Perm. Delete';
+                    permDeleteBtn.className = 'delete-btn';
+                    permDeleteBtn.addEventListener('click', () => deleteTask(task._id));
+                    actionsDiv.appendChild(permDeleteBtn);
                 }
 
                 li.appendChild(actionsDiv);
@@ -404,7 +407,7 @@
                 if (response.ok) {
                     displayMessage(todoMessage, 'Task added successfully!', 'success');
                     newTaskInput.value = '';
-                    fetchTasks(); // Refresh list to show new task
+                    fetchTasks(); // Refresh the list to show this new task
                 } else {
                     displayMessage(todoMessage, data.error || 'Failed to add task.', 'error');
                     if (response.status === 401 || response.status === 403) {
@@ -433,7 +436,7 @@
 
                 if (response.ok) {
                     displayMessage(todoMessage, `Task status updated to '${newStatus}'!`, 'success');
-                    fetchTasks(); // Refresh list
+                    fetchTasks(); // Refresh the list
                 } else {
                     displayMessage(todoMessage, data.error || 'Failed to update task status.', 'error');
                     if (response.status === 401 || response.status === 403) {
@@ -447,7 +450,6 @@
             }
         }
 
-        // Optional: Function for permanent deletion, not just status change to 'deleted'
         async function deleteTask(taskId) {
             if (!confirm('Are you sure you want to permanently delete this task? This cannot be undone.')) {
                 return;
@@ -462,7 +464,7 @@
 
                 if (response.ok) {
                     displayMessage(todoMessage, 'Task permanently deleted!', 'success');
-                    fetchTasks(); // Refresh list
+                    fetchTasks(); // Refresh the list
                 } else {
                     const data = await response.json();
                     displayMessage(todoMessage, data.error || 'Failed to delete task permanently.', 'error');
@@ -480,8 +482,8 @@
 
         // --- Event Listeners ---
         logoutBtn.addEventListener('click', () => {
-            localStorage.clear(); // Clear token and username
-            window.location.href = 'login.html'; // Redirect to login page
+            localStorage.clear(); // Clear the token and username
+            window.location.href = 'login.html'; // Redirect to the login page
         });
         addTaskBtn.addEventListener('click', addTask);
         newTaskInput.addEventListener('keypress', (e) => {

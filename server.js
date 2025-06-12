@@ -1,19 +1,19 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./db'); // MongoDB connection setup
+const connectDB = require('./db');
 const authController = require('./controllers/authController');
 const taskController = require('./controllers/taskController');
 const authenticateToken = require('./middleware/authMiddleware');
 
-// Load environment variables from .env file
+// Load environment variables from the .env file
 dotenv.config();
 
 // Connect to MongoDB
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 8000; // Use port from env or default to 8000
+const PORT = process.env.PORT || 8000;
 
 // --- Middleware ---
 app.use(express.json()); // Body parser for JSON requests
@@ -23,8 +23,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// --- Logging Middleware (Global Error Handling Part 1) ---
-// This is a basic request logger. You'd typically use a dedicated logger like Winston.
+// --- Logging Middleware ---
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
@@ -33,10 +32,7 @@ app.use((req, res, next) => {
 // --- Routes ---
 
 // Default Route (Public)
-home = async (req, res) => {
-    return res.status(200).json({message:'Welcome to the TodoApp Server. See logs for Endpoint list.'});
-}
-app.get('/', home);
+app.get('/', (req, res) => { return res.status(200).send('Hello, World!') });
 
 // Authentication Routes (Public)
 app.post('/api/signup', authController.signup);
@@ -48,9 +44,7 @@ app.get('/api/tasks', authenticateToken, taskController.getTasks);
 app.put('/api/tasks/:taskId/status', authenticateToken, taskController.updateTaskStatus);
 app.delete('/api/tasks/:taskId', authenticateToken, taskController.deleteTask);
 
-// Global Error Handling Middleware (Part 2)
-// This catches errors that are passed to next() from other middleware/routes
-// or unhandled errors in async routes.
+// Global Error Handling Middleware to catch errors that are passed to next() from other middleware/routes
 app.use((err, req, res, next) => {
     console.error(`[${new Date().toISOString()}] GLOBAL ERROR: ${err.stack}`);
     res.status(500).json({ error: 'Something went wrong on the server.' });
@@ -58,12 +52,13 @@ app.use((err, req, res, next) => {
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`API Endpoints:`);
-    console.log(`  POST /api/signup`);
-    console.log(`  POST /api/login`);
-    console.log(`  POST /api/tasks (Protected)`);
-    console.log(`  GET /api/tasks (Protected)`);
-    console.log(`  PUT /api/tasks/:taskId/status (Protected)`);
-    console.log(`  DELETE /api/tasks/:taskId (Protected)`);
-});
+    console.log(```
+Server running on port ${PORT}
+API Endpoints:
+  POST /api/signup
+  POST /api/login
+  POST /api/tasks (Protected)
+  GET /api/tasks (Protected)
+  PUT /api/tasks/:taskId/status (Protected)
+  DELETE /api/tasks/:taskId (Protected)
+    ```)});

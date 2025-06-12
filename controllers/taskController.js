@@ -46,9 +46,9 @@ const getTasks = async (req, res) => {
 
 const updateTaskStatus = async (req, res) => {
     try {
-        const { taskId } = req.params; // From URL parameter
-        const { status } = req.body;   // New status from request body
-        const userId = req.user.id;     // User ID from JWT payload
+        const { taskId } = req.params; // From the URL parameter
+        const { status } = req.body; // New status from the request body
+        const userId = req.user.id; // User ID from the JWT payload
 
         if (!['pending', 'completed', 'deleted'].includes(status)) {
             log('ERROR', `User ${userId} - Update task ${taskId} status failed: Invalid status value: ${status}`);
@@ -58,7 +58,7 @@ const updateTaskStatus = async (req, res) => {
         // Find the task by ID and ensure it belongs to the authenticated user
         const task = await Task.findOneAndUpdate(
             { _id: taskId, userId: userId }, // Find by task ID AND user ID
-            { $set: { status: status } },    // Set the new status
+            { $set: { status: status } }, // Set the new status
             { new: true, runValidators: true } // Return the updated document, run schema validators
         );
 
