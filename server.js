@@ -52,7 +52,7 @@ app.use((err, req, res, next) => {
 
 // Start the server
 app.listen(PORT, () => {
-    console.log(```
+    console.log(`
 Server running on port ${PORT}
 API Endpoints:
   POST /api/signup
@@ -61,4 +61,4 @@ API Endpoints:
   GET /api/tasks (Protected)
   PUT /api/tasks/:taskId/status (Protected)
   DELETE /api/tasks/:taskId (Protected)
-    ```)});
+    `)});
